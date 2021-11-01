@@ -1,3 +1,4 @@
+import 'package:flame/game.dart';
 import 'package:flame/palette.dart';
 import 'package:flutter/material.dart';
 
@@ -25,4 +26,15 @@ class ImagePath {
     dropGold,
     dropSilver,
   ];
+}
+
+class Paints {
+
+  static TextPaint large = TextPaint(
+    config: const TextPaintConfig(
+      fontSize: 48.0,
+      fontFamily: 'Awesome Font',
+    ),
+  );
+
 }
