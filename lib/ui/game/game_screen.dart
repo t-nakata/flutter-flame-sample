@@ -66,6 +66,7 @@ class DropField extends PositionComponent with Draggable {
 
   SpriteComponent? _draggedDrop;
   SpriteComponent? _overlayDrop;
+  int? _dragId;
   Vector2? _dragDeltaPosition;
 
   DropField(this.dropSize, this.game, this.dropInfo) {
@@ -110,35 +111,30 @@ class DropField extends PositionComponent with Draggable {
   SpriteComponent createOverlayDrop(SpriteComponent drop, Vector2 position) {
     final dropSprite = drop.sprite;
     return SpriteComponent(
-      position: position,
-      size: Vector2(dropSize, dropSize),
-      sprite: dropSprite
-    )
-    ..anchor = Anchor.center;
+        position: position,
+        size: Vector2(dropSize, dropSize),
+        sprite: dropSprite)
+      ..anchor = Anchor.center;
   }
 
   @override
   bool onDragStart(int pointerId, DragStartInfo info) {
-    print("onDragStart: ${info.raw}");
-
-    var offset = info.eventPosition.game - position;
-    _dragDeltaPosition = offset;
-
-    for (var element in children) {
-      if (element is SpriteComponent) {
-        if (element.position.x <= offset.x &&
-            element.position.x + element.size.x > offset.x &&
-            element.position.y <= offset.y &&
-            element.position.y + element.size.y > offset.y) {
-          _draggedDrop = element;
-        }
-      }
+    print("onDragStart: ${info.raw}, pointerId: $pointerId");
+    if (_dragId != null) {
+      return false;
+    } else {
+      _dragId = pointerId;
     }
+
+    var localPosition = info.eventPosition.game - position;
+    _dragDeltaPosition = localPosition;
+
+    _draggedDrop = isHitDrop(localPosition);
 
     final drop = _draggedDrop;
     if (drop is SpriteComponent) {
       drop.setOpacity(0.0);
-      _overlayDrop = createOverlayDrop(drop, offset);
+      _overlayDrop = createOverlayDrop(drop, localPosition);
       add(_overlayDrop!);
       return true;
     }
@@ -149,15 +145,24 @@ class DropField extends PositionComponent with Draggable {
   @override
   bool onDragUpdate(int pointerId, DragUpdateInfo info) {
     // print("onDragUpdate: ${info.raw}, overlayDrop: ${_overlayDrop?.position}");
-
-    final overlayDrop = _overlayDrop;
-    final dragDeltaPosition = _dragDeltaPosition;
-    if (overlayDrop is SpriteComponent && dragDeltaPosition is Vector2) {
-      overlayDrop.position.setFrom(info.eventPosition.game - position);
+    if (_dragId != pointerId) {
+      return false;
     }
 
+    final overlayDrop = _overlayDrop;
+    if (overlayDrop is SpriteComponent) {
+      final localPosition = info.eventPosition.game - position;
+      // print("width: $width, height: $height, local: $localPosition");
+      if (!isFieldIn(localPosition)) {
+        // フィールド外なので後続処理しない
+        return false;
+      }
 
+      overlayDrop.position.setFrom(localPosition);
 
+      // 入れ替え判定
+      swapDrop(isHitDrop(localPosition), _draggedDrop);
+    }
 
     return super.onDragUpdate(pointerId, info);
   }
@@ -165,17 +170,78 @@ class DropField extends PositionComponent with Draggable {
   @override
   bool onDragEnd(int pointerId, DragEndInfo info) {
     print("onDragEnd: ${info.raw}");
-    _draggedDrop?.setOpacity(1.0);
-    if (_overlayDrop != null) {
-      remove(_overlayDrop!);
+    if (_dragId != pointerId) {
+      return false;
     }
-    _draggedDrop = null;
+
+    endDrag();
     return super.onDragEnd(pointerId, info);
   }
 
   @override
   bool onDragCancel(int pointerId) {
     print("onDragCancel: ${pointerId}");
+    if (_dragId != pointerId) {
+      return false;
+    }
+    endDrag();
     return super.onDragCancel(pointerId);
+  }
+
+  void endDrag() {
+    _draggedDrop?.setOpacity(1.0);
+    if (_overlayDrop != null) {
+      remove(_overlayDrop!);
+    }
+    _draggedDrop = null;
+    _dragId = null;
+  }
+
+  SpriteComponent? isHitDrop(Vector2 hitPosition) {
+    for (var element in children) {
+      if (element is SpriteComponent) {
+        if (element.position.x <= hitPosition.x &&
+            element.position.x + element.size.x > hitPosition.x &&
+            element.position.y <= hitPosition.y &&
+            element.position.y + element.size.y > hitPosition.y) {
+          return element;
+        }
+      }
+    }
+
+    return null;
+  }
+
+  bool isFieldIn(Vector2 vector) {
+    return !(0 > vector.x ||
+        vector.x > width ||
+        0 > vector.y ||
+        vector.y > height);
+  }
+
+  void swapDrop(SpriteComponent? sc1, SpriteComponent? sc2) {
+    final list = [
+      dropSize * 0,
+      dropSize * 1,
+      dropSize * 2,
+      dropSize * 3,
+      dropSize * 4,
+      dropSize * 5,
+      dropSize * 6,
+    ];
+
+    if (sc1 != null && sc2 != null) {
+      // Swap
+      // print("before: ${targetDrop.position}, ${draggedDrop.position}");
+      final swapV = sc1.position.clone();
+      if (list.contains(swapV.x) && list.contains(swapV.y)) {
+        sc1.position.setFrom(sc2.position);
+        sc2.position.setFrom(swapV);
+      } else {
+        print("out: $swapV, list: $list");
+      }
+
+      // print("after : ${targetDrop.position}, ${draggedDrop.position}");
+    }
   }
 }
