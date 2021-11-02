@@ -39,8 +39,6 @@ class TitleScreen extends PositionComponent {
 class StartButton extends PositionComponent with Tappable {
   late TextComponent textComponent;
   bool _beenPressed = false;
-  static final Paint _white = Paint()..color = const Color(0xFFFFFFFF);
-  static final Paint _grey = Paint()..color = const Color(0xFFA5A5A5);
   ScreenCallback screenCallback;
 
   StartButton(this.screenCallback, {Vector2? position})
@@ -56,7 +54,7 @@ class StartButton extends PositionComponent with Tappable {
   @override
   void render(Canvas canvas) {
     super.render(canvas);
-    canvas.drawRect(size.toRect(), _beenPressed ? _grey : _white);
+    canvas.drawRect(size.toRect(), _beenPressed ? Paints.grey : Paints.white);
   }
 
   @override

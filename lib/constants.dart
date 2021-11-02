@@ -16,6 +16,7 @@ class ImagePath {
   static const dropPurple = "ball07_purple.png";
   static const dropGold = "ball11_gold.png";
   static const dropSilver = "ball12_silver.png";
+  static const blockPink = "block01_pink.png";
 
   static const drops = [
     dropRed,
@@ -23,9 +24,14 @@ class ImagePath {
     dropGreen,
     dropYellow,
     dropPurple,
+    blockPink,
     dropGold,
     dropSilver,
   ];
+
+  static String getPath(int index) {
+    return drops[index];
+  }
 }
 
 class Paints {
@@ -36,5 +42,9 @@ class Paints {
       fontFamily: 'Awesome Font',
     ),
   );
+
+  static final Paint white = Paint()..color = const Color(0xFFFFFFFF);
+  static final Paint grey = Paint()..color = const Color(0xFFA5A5A5);
+  static final Paint black = Paint()..color = const Color(0xFF000000);
 
 }

@@ -6,7 +6,8 @@ import 'package:flutter_flame/ui/title/title_screen.dart';
 
 typedef ScreenCallback = void Function(Screen);
 
-class PuzzleGame extends FlameGame with FPSCounter, HasTappableComponents {
+class PuzzleGame extends FlameGame
+    with FPSCounter, HasTappableComponents, HasDraggableComponents {
   Screen _currentScreen = Screen.title;
 
   late TitleScreen _titleScreen;
@@ -38,7 +39,8 @@ class PuzzleGame extends FlameGame with FPSCounter, HasTappableComponents {
         // TODO 画面遷移の定義
       },
     );
-    add(_titleScreen);
+    // add(_titleScreen);
+    add(_gameScreen);
   }
 
   @override
