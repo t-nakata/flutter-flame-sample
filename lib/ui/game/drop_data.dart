@@ -1,5 +1,4 @@
 import 'package:flame/components.dart';
-import 'package:flutter_flame/constants.dart';
 
 class DropData {
   final double dropSize;
@@ -8,7 +7,7 @@ class DropData {
   int y = 0;
   Vector2 position = Vector2(0, 0);
   bool _isVisible = true;
-  SpriteComponent? component;
+  late SpriteComponent component;
 
   DropData(this.dropSize, this.dropType, this.x, this.y) {
     position = Vector2(x * dropSize, y * dropSize);
@@ -19,6 +18,7 @@ class DropData {
 
     x = (newPosition.x / dropSize).round();
     y = (newPosition.y / dropSize).round();
+    component.position.setFrom(newPosition);
   }
 
   void setVisible(bool visible) {

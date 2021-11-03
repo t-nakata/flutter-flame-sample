@@ -7,14 +7,20 @@ import 'package:flutter_flame/constants.dart';
 import 'package:flutter_flame/puzzle_game.dart';
 import 'package:flutter_flame/ui/game/drop_data.dart';
 
+typedef SpriteComponentCallBack = void Function(SpriteComponent);
+
 class DropManager {
   HashMap<String, DropData> dropMap = HashMap<String, DropData>();
   double dropSize;
   PuzzleGame game;
   bool availableUserAction = true;
-  List<List<DropData>> removeList = [];
+  SpriteComponentCallBack removeCallBack;
+  SpriteComponentCallBack addCallBack;
 
-  DropManager(this.dropSize, this.game);
+  int dropDownEffectCount = 0;
+
+  DropManager(this.dropSize, this.game,
+      {required this.addCallBack, required this.removeCallBack});
 
   init() {
     createDropList();
@@ -31,6 +37,13 @@ class DropManager {
         dropMap[key] = DropData(dropSize, dropType, i, j);
       }
     }
+  }
+
+  addNewDrop(int x, int y) {
+    final rnd = Random();
+    int dropType = rnd.nextInt(6);
+    String key = "${x}_$y";
+    dropMap[key] = DropData(dropSize, dropType, x, y);
   }
 
   Future<SpriteComponent> createDrop(int x, int y) async {
@@ -67,18 +80,28 @@ class DropManager {
 
     dropMap[drop1.getKey()] = drop1;
     dropMap[drop2.getKey()] = drop2;
-    // printDropMap();
+    printDropMap();
   }
 
   onDragEnd() async {
     // Dropの3連チェック
-    removeList = checkChain();
+    List<List<DropData>> removeList = checkChain();
     print("removeList: $removeList");
     fadeOutEffect(removeList.toList());
   }
 
   void onCompleteFadeOut() {
-    print("animation Completed");
+    print("onCompleteFadeOut");
+    dropDownEffect();
+  }
+
+  void onCompleteDropDown() {
+    dropDownEffectCount--;
+    if (dropDownEffectCount == 0) {
+      print("onCompleteDropDown");
+      printDropMap();
+      onDragEnd();
+    }
   }
 
   List<List<DropData>> checkChain() {
@@ -171,8 +194,8 @@ class DropManager {
       availableUserAction = false;
       // まず非表示
       var count = 0;
+      bool listenerAdded = false;
       while (hideList.isNotEmpty) {
-        // OpacityEffect fadeOut = OpacityEffect(opacity: 0, duration: 0);
         count++;
         var target = hideList.first;
         hideList.remove(target);
@@ -182,13 +205,83 @@ class DropManager {
             duration: 0.2,
             initialDelay: 0.3 * count,
           );
-          drop.component?.add(fadeOut);
-          if (hideList.isNotEmpty) {
+          drop.component.add(fadeOut);
+          drop.setVisible(false);
+          if (hideList.isEmpty && !listenerAdded) {
+            listenerAdded = true;
             fadeOut.onComplete = () => onCompleteFadeOut();
           }
         }
       }
+    } else {
+      availableUserAction = true;
     }
+  }
+
+  void dropDownEffect() async {
+    final visibleList =
+        dropMap.values.where((drop) => drop.isVisible()).toList();
+    final removeList =
+        dropMap.values.where((drop) => !drop.isVisible()).toList();
+
+    // 削除
+    for (var drop in removeList) {
+      removeCallBack.call(drop.component);
+    }
+
+    for (int i = 0; i < 6; i++) {
+      var drops = visibleList.where((d) => d.x == i).toList();
+      drops.sort((a, b) => a.y.compareTo(b.y) * -1);
+      for (int j = 0; j < 5; j++) {
+        var newY = 4 - j;
+        if (drops.length > j) {
+          var drop = drops[j];
+          var oldY = drop.y;
+          dropDownEffectCount++;
+          drop.component.add(
+            MoveEffect(
+              path: [
+                Vector2(dropSize * i, dropSize * oldY),
+                Vector2(dropSize * i, dropSize * newY),
+              ],
+              speed: 1000,
+              onComplete: () {
+                drop.y = newY;
+                drop.move(Vector2(dropSize * i, dropSize * newY));
+                dropMap[drop.getKey()] = drop;
+                onCompleteDropDown();
+              },
+            ),
+          );
+        } else {
+          var oldY = drops.length - j;
+          addNewDrop(i, oldY);
+          var drop = dropMap["${i}_$oldY"];
+          if (drop != null) {
+            drop.component = await createDrop(i, oldY);
+            addCallBack.call(drop.component);
+            dropDownEffectCount++;
+            drop.component.add(
+              MoveEffect(
+                path: [
+                  Vector2(dropSize * i, dropSize * oldY),
+                  Vector2(dropSize * i, dropSize * newY),
+                ],
+                speed: 1000,
+                onComplete: () {
+                  dropMap.remove("${i}_$oldY");
+                  drop.y = newY;
+                  drop.move(Vector2(dropSize * i, dropSize * newY));
+                  dropMap[drop.getKey()] = drop;
+                  onCompleteDropDown();
+                },
+              ),
+            );
+          }
+        }
+      }
+    }
+
   }
 
   printDropMap() {

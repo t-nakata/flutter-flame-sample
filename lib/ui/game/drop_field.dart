@@ -1,4 +1,3 @@
-
 import 'dart:ui';
 
 import 'package:flame/components.dart';
@@ -18,7 +17,12 @@ class DropField extends PositionComponent with Draggable {
   int? _dragId;
 
   DropField(this.dropSize, this.game) {
-    dropManager = DropManager(dropSize, game);
+    dropManager = DropManager(
+      dropSize,
+      game,
+      addCallBack: (drop) => add(drop),
+      removeCallBack: (drop) => remove(drop),
+    );
     width = dropSize * 6;
     height = dropSize * 5;
     position = Vector2(0, game.size.y - height - dropSize / 2);
@@ -39,7 +43,6 @@ class DropField extends PositionComponent with Draggable {
     super.render(canvas);
     canvas.drawRect(size.toRect(), Paints.black);
   }
-
 
   SpriteComponent createOverlayDrop(SpriteComponent drop, Vector2 position) {
     final dropSprite = drop.sprite;
@@ -169,14 +172,11 @@ class DropField extends PositionComponent with Draggable {
       final swapV = sc1.position.clone();
       if (list.contains(swapV.x) && list.contains(swapV.y)) {
         dropManager.swap(sc1.position, sc2.position);
-        sc1.position.setFrom(sc2.position);
-        sc2.position.setFrom(swapV);
       } else {
         print("out: $swapV, list: $list");
       }
 
       // print("after : ${targetDrop.position}, ${draggedDrop.position}");
     }
-
   }
 }
