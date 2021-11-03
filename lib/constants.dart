@@ -9,14 +9,12 @@ class Palette {
 }
 
 class ImagePath {
-  static const dropRed = "ball01_red.png";
-  static const dropBlue = "ball05_blue.png";
-  static const dropGreen = "ball06_green.png";
-  static const dropYellow = "ball03_yellow.png";
-  static const dropPurple = "ball07_purple.png";
-  static const dropGold = "ball11_gold.png";
-  static const dropSilver = "ball12_silver.png";
-  static const blockPink = "block01_pink.png";
+  static const dropRed = "drop_red.png";
+  static const dropBlue = "drop_blue.png";
+  static const dropGreen = "drop_green.png";
+  static const dropYellow = "drop_yellow.png";
+  static const dropPurple = "drop_purple.png";
+  static const blockPink = "block_pink.png";
 
   static const drops = [
     dropRed,
@@ -25,8 +23,6 @@ class ImagePath {
     dropYellow,
     dropPurple,
     blockPink,
-    dropGold,
-    dropSilver,
   ];
 
   static String getPath(int index) {
