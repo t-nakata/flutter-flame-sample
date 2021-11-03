@@ -6,45 +6,52 @@ import 'package:flutter/material.dart';
 import 'package:flutter_flame/constants.dart';
 import 'package:flutter_flame/puzzle_game.dart';
 
-class TitleScreen extends PositionComponent {
+class TitleScreen extends PositionComponent with HasGameRef<PuzzleGame>  {
   final ScreenCallback screenCallback;
   late TextComponent titleTextComponent;
   late StartButton buttonComponent;
+  late StartButton buttonComponent2;
 
   TitleScreen(
     this.screenCallback,
-  ) {
+  ) {}
+
+  @override
+  Future<void>? onLoad() async {
+    await super.onLoad();
+
     titleTextComponent = TextComponent(
       "パズルゲーム",
       textRenderer: Paints.large,
-    )..anchor = Anchor.topCenter;
+    )
+      ..anchor = Anchor.center
+      ..position = Vector2(gameRef.size.x / 2, gameRef.size.y / 10);
 
-    buttonComponent = StartButton(screenCallback, position: Vector2(0, 500.0))
-      ..anchor = Anchor.center;
+    buttonComponent =
+        StartButton(screenCallback, "normal", position: Vector2(0, 500.0))
+          ..anchor = Anchor.center
+          ..position = Vector2(gameRef.size.x / 2, 500);
+    buttonComponent2 =
+        StartButton(screenCallback, "8x7", position: Vector2(0, 600.0))
+          ..anchor = Anchor.center
+          ..position = Vector2(gameRef.size.x / 2, 600);
+
     add(titleTextComponent);
     add(buttonComponent);
+    add(buttonComponent2);
   }
 
-  @override
-  void onGameResize(Vector2 gameSize) {
-    super.onGameResize(gameSize);
-    print("onGameResize: gameSize: $gameSize");
-    titleTextComponent.x = gameSize.x / 2;
-    titleTextComponent.y = gameSize.y / 10;
-    buttonComponent.x = gameSize.x / 2;
-    buttonComponent.y = gameSize.y / 10 * 8;
-  }
 }
 
 class StartButton extends PositionComponent with Tappable {
   late TextComponent textComponent;
   bool _beenPressed = false;
   ScreenCallback screenCallback;
+  String value;
 
-  StartButton(this.screenCallback, {Vector2? position})
+  StartButton(this.screenCallback, this.value, {Vector2? position})
       : super(position: position ?? Vector2(0, 0), size: Vector2(280, 68)) {
-
-    textComponent = TextComponent("Game Start", textRenderer: Paints.large)
+    textComponent = TextComponent("Start $value", textRenderer: Paints.large)
       ..anchor = Anchor.center
       ..x = (size.x - 10) / 2
       ..y = size.y / 2;
@@ -60,7 +67,7 @@ class StartButton extends PositionComponent with Tappable {
   @override
   bool onTapUp(TapUpInfo info) {
     if (_beenPressed) {
-      screenCallback.call(Screen.game);
+      screenCallback.call(Screen.game, value);
     }
     _beenPressed = false;
     return true;

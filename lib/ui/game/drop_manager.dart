@@ -16,10 +16,13 @@ class DropManager {
   bool availableUserAction = true;
   SpriteComponentCallBack removeCallBack;
   SpriteComponentCallBack addCallBack;
+  final int col;
+  final int row;
+
 
   int dropDownEffectCount = 0;
 
-  DropManager(this.dropSize, this.game,
+  DropManager(this.dropSize, this.game,this.col, this.row,
       {required this.addCallBack, required this.removeCallBack});
 
   init() {
@@ -30,8 +33,8 @@ class DropManager {
   createDropList() {
     final rnd = Random();
     dropMap.clear();
-    for (int i = 0; i < 6; i++) {
-      for (int j = 0; j < 5; j++) {
+    for (int i = 0; i < col; i++) {
+      for (int j = 0; j < row; j++) {
         int dropType = rnd.nextInt(6);
         String key = "${i}_$j";
         dropMap[key] = DropData(dropSize, dropType, i, j);
@@ -110,8 +113,8 @@ class DropManager {
     // 縦3連以上を探す
     List<DropData> tempList = [];
     int currentDropType = -1;
-    for (int i = 0; i < 6; i++) {
-      for (int j = 0; j < 5; j++) {
+    for (int i = 0; i < col; i++) {
+      for (int j = 0; j < row; j++) {
         var data = dropMap["${i}_$j"];
         if (data == null) {
           continue;
@@ -136,8 +139,8 @@ class DropManager {
     }
 
     // 横3連以上を探す
-    for (int j = 0; j < 5; j++) {
-      for (int i = 0; i < 6; i++) {
+    for (int j = 0; j < row; j++) {
+      for (int i = 0; i < col; i++) {
         var data = dropMap["${i}_$j"];
         if (data == null) {
           continue;
@@ -229,11 +232,11 @@ class DropManager {
       removeCallBack.call(drop.component);
     }
 
-    for (int i = 0; i < 6; i++) {
+    for (int i = 0; i < col; i++) {
       var drops = visibleList.where((d) => d.x == i).toList();
       drops.sort((a, b) => a.y.compareTo(b.y) * -1);
-      for (int j = 0; j < 5; j++) {
-        var newY = 4 - j;
+      for (int j = 0; j < row; j++) {
+        var newY = row - 1 - j;
         if (drops.length > j) {
           var drop = drops[j];
           var oldY = drop.y;
@@ -286,8 +289,8 @@ class DropManager {
 
   printDropMap() {
     String message = "{\n";
-    for (int j = 0; j < 5; j++) {
-      for (int i = 0; i < 6; i++) {
+    for (int j = 0; j < row; j++) {
+      for (int i = 0; i < col; i++) {
         String key = "${i}_$j";
         int type = dropMap[key]?.dropType ?? 0;
         message += "$type ";

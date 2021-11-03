@@ -34,7 +34,14 @@ class Paints {
 
   static TextPaint large = TextPaint(
     config: const TextPaintConfig(
-      fontSize: 48.0,
+      fontSize: 36.0,
+      fontFamily: 'Awesome Font',
+    ),
+  );
+
+  static TextPaint normal = TextPaint(
+    config: const TextPaintConfig(
+      fontSize: 24.0,
       fontFamily: 'Awesome Font',
     ),
   );

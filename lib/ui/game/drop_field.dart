@@ -9,6 +9,8 @@ import 'package:flutter_flame/ui/game/drop_manager.dart';
 class DropField extends PositionComponent with Draggable {
   final double dropSize;
   final PuzzleGame game;
+  final int col;
+  final int row;
   late final DropManager dropManager;
 
   SpriteComponent? _draggedDrop;
@@ -16,23 +18,25 @@ class DropField extends PositionComponent with Draggable {
 
   int? _dragId;
 
-  DropField(this.dropSize, this.game) {
+  DropField(this.dropSize, this.game, this.col, this.row) {
     dropManager = DropManager(
       dropSize,
       game,
+      col,
+      row,
       addCallBack: (drop) => add(drop),
       removeCallBack: (drop) => remove(drop),
     );
-    width = dropSize * 6;
-    height = dropSize * 5;
+    width = dropSize * col;
+    height = dropSize * row;
     position = Vector2(0, game.size.y - height - dropSize / 2);
-    size = Vector2(dropSize * 6, dropSize * 5);
+    size = Vector2(dropSize * col, dropSize * row);
   }
 
   Future<void> init() async {
     dropManager.init();
-    for (int i = 0; i < 6; i++) {
-      for (int j = 0; j < 5; j++) {
+    for (int i = 0; i < col; i++) {
+      for (int j = 0; j < row; j++) {
         add(await dropManager.createDrop(i, j));
       }
     }
@@ -164,6 +168,10 @@ class DropField extends PositionComponent with Draggable {
       dropSize * 4,
       dropSize * 5,
       dropSize * 6,
+      dropSize * 7,
+      dropSize * 8,
+      dropSize * 9,
+      dropSize * 10,
     ];
 
     if (sc1 != null && sc2 != null) {
