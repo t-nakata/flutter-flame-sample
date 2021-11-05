@@ -62,7 +62,7 @@ class PuzzleGame extends FlameGame
         break;
     }
 
-    fpsTextPaint.render(canvas, fps(120).toString(), Vector2(0, 50));
+    fpsTextPaint.render(canvas, fps(120).toString(), Vector2(0, 0));
   }
 
   @override

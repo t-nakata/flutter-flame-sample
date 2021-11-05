@@ -257,7 +257,7 @@ class DropManager {
             ),
           );
         } else {
-          var oldY = drops.length - j;
+          var oldY = drops.length - j - 1;
           addNewDrop(i, oldY);
           var drop = dropMap["${i}_$oldY"];
           if (drop != null) {
