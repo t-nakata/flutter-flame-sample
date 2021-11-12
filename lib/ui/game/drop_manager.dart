@@ -6,6 +6,7 @@ import 'package:flame/effects.dart';
 import 'package:flutter_flame/constants.dart';
 import 'package:flutter_flame/puzzle_game.dart';
 import 'package:flutter_flame/ui/game/drop_data.dart';
+import 'package:flutter_flame/ui/game/game_data.dart';
 
 typedef SpriteComponentCallBack = void Function(SpriteComponent);
 
@@ -18,9 +19,8 @@ class DropManager {
   SpriteComponentCallBack addCallBack;
   final int col;
   final int row;
-
-
   int dropDownEffectCount = 0;
+  GameData data = GameData();
 
   DropManager(this.dropSize, this.game,this.col, this.row,
       {required this.addCallBack, required this.removeCallBack});
@@ -68,7 +68,8 @@ class DropManager {
     return drop;
   }
 
-  onDragStart() {}
+  onDragStart() {
+  }
 
   swap(Vector2 v1, Vector2 v2) {
     if (v1.distanceTo(v2) == 0) {
@@ -91,6 +92,7 @@ class DropManager {
     List<List<DropData>> removeList = checkChain();
     print("removeList: $removeList");
     fadeOutEffect(removeList.toList());
+    data.addCombo(removeList.length);
   }
 
   void onCompleteFadeOut() {
@@ -101,7 +103,7 @@ class DropManager {
   void onCompleteDropDown() {
     dropDownEffectCount--;
     if (dropDownEffectCount == 0) {
-      print("onCompleteDropDown");
+      print("onCompleteDropDown, $data");
       printDropMap();
       onDragEnd();
     }
@@ -202,6 +204,7 @@ class DropManager {
         count++;
         var target = hideList.first;
         hideList.remove(target);
+        data.remove(target.first.dropType, target.length);
         for (var drop in target) {
           var fadeOut = OpacityEffect(
             opacity: 0,
@@ -218,6 +221,7 @@ class DropManager {
       }
     } else {
       availableUserAction = true;
+      data.resetCombo();
     }
   }
 

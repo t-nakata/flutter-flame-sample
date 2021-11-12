@@ -15,8 +15,9 @@ class DropField extends PositionComponent with Draggable {
 
   SpriteComponent? _draggedDrop;
   SpriteComponent? _overlayDrop;
-
   int? _dragId;
+  Timer _dragTimer = Timer(15);
+
 
   DropField(this.dropSize, this.game, this.col, this.row) {
     dropManager = DropManager(
@@ -48,6 +49,18 @@ class DropField extends PositionComponent with Draggable {
     canvas.drawRect(size.toRect(), Paints.black);
   }
 
+  @override
+  void update(double dt) {
+    super.update(dt);
+    _dragTimer.update(dt);
+    if (_dragTimer.finished) {
+      endDrag();
+      print("_dragTime.finishd");
+    } else {
+      print("_dratTime: ${_dragTimer.progress}, ${_dragTimer.current}");
+    }
+  }
+
   SpriteComponent createOverlayDrop(SpriteComponent drop, Vector2 position) {
     final dropSprite = drop.sprite;
     return SpriteComponent(
@@ -75,6 +88,8 @@ class DropField extends PositionComponent with Draggable {
       drop.setOpacity(0.0);
       _overlayDrop = createOverlayDrop(drop, localPosition);
       add(_overlayDrop!);
+      _dragTimer = Timer(10);
+      _dragTimer.start();
       return true;
     }
 
@@ -135,6 +150,7 @@ class DropField extends PositionComponent with Draggable {
     }
     _draggedDrop = null;
     _dragId = null;
+    _dragTimer.stop();
   }
 
   SpriteComponent? isHitDrop(Vector2 hitPosition) {
