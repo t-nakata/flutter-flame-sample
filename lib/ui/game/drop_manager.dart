@@ -242,14 +242,15 @@ class DropManager {
       drops.sort((a, b) => a.y.compareTo(b.y) * -1);
       for (int j = 0; j < row; j++) {
         var newY = row - 1 - j;
+        final toPosition = Vector2(dropSize * i, dropSize * newY);
         if (drops.length > j) {
           var drop = drops[j];
-          var oldY = drop.y;
           dropDownEffectCount++;
+          print("x: ${toPosition.x}, y: ${toPosition.y}");
           drop.component.add(
             MoveToEffect(
-              Vector2(0, dropSize * (oldY - newY)),
-              EffectController(duration: 1.0),
+              toPosition,
+              EffectController(duration: 0.2),
               onComplete: () {
                 drop.y = newY;
                 drop.move(Vector2(dropSize * i, dropSize * newY));
@@ -268,8 +269,8 @@ class DropManager {
             dropDownEffectCount++;
             drop.component.add(
               MoveToEffect(
-                Vector2(0, dropSize * (oldY - newY)),
-                EffectController(duration: 1.0),
+                toPosition,
+                EffectController(duration: 0.2),
                 onComplete: () {
                   dropMap.remove("${i}_$oldY");
                   drop.y = newY;

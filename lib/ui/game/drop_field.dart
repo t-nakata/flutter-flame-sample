@@ -17,7 +17,6 @@ class DropField extends PositionComponent with Draggable {
   SpriteComponent? _overlayDrop;
   Timer _dragTimer = Timer(15);
 
-
   DropField(this.dropSize, this.game, this.col, this.row) {
     dropManager = DropManager(
       dropSize,

@@ -1,4 +1,4 @@
-import 'package:flame/experimental.dart';
+import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
@@ -7,23 +7,14 @@ import 'package:flutter_flame/ui/title/title_screen.dart';
 
 typedef ScreenCallback = void Function(Screen, String);
 
-class PuzzleGame extends FlameGame
-    with FPSCounter, HasTappableComponents, HasDraggableComponents {
+class PuzzleGame extends FlameGame with HasTappables, HasDraggables {
   Screen _currentScreen = Screen.title;
 
   late TitleScreen _titleScreen;
   late GameScreen _gameScreen;
 
-  static final fpsTextPaint = TextPaint(
-    style: const TextStyle(
-      color: Color(0xFFFFFFFF),
-      fontFamily: 'Arial',
-      fontSize: 24,
-    ),
-  );
-
   @override
-  Future<void>? onLoad() async {
+  Future<void> onLoad() async {
     await super.onLoad();
 
     _titleScreen = TitleScreen(
@@ -60,25 +51,12 @@ class PuzzleGame extends FlameGame
         value,
       ),
     );
-    // add(_titleScreen);
-    add(_gameScreen);
+    add(_titleScreen);
+    // add(_gameScreen);
+
+    add(FpsTextComponent(position: Vector2(0, 0)));
   }
 
-  @override
-  void render(Canvas canvas) {
-    super.render(canvas);
-
-    switch (_currentScreen) {
-      case Screen.title:
-        _titleScreen.render(canvas);
-        break;
-      case Screen.game:
-        _gameScreen.render(canvas);
-        break;
-    }
-
-    fpsTextPaint.render(canvas, fps(120).toString(), Vector2(0, 0));
-  }
 
   @override
   Color backgroundColor() => const Color(0xFFe3e3e3);
