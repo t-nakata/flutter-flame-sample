@@ -15,7 +15,6 @@ class DropField extends PositionComponent with Draggable {
 
   SpriteComponent? _draggedDrop;
   SpriteComponent? _overlayDrop;
-  int? _dragId;
   Timer _dragTimer = Timer(15);
 
 
@@ -71,12 +70,10 @@ class DropField extends PositionComponent with Draggable {
   }
 
   @override
-  bool onDragStart(int pointerId, DragStartInfo info) {
-    print("onDragStart: ${info.raw}, pointerId: $pointerId");
-    if (_dragId != null || !dropManager.availableUserAction) {
+  bool onDragStart(DragStartInfo info) {
+    print("onDragStart: ${info.raw}");
+    if (!dropManager.availableUserAction) {
       return false;
-    } else {
-      _dragId = pointerId;
     }
 
     var localPosition = info.eventPosition.game - position;
@@ -97,11 +94,8 @@ class DropField extends PositionComponent with Draggable {
   }
 
   @override
-  bool onDragUpdate(int pointerId, DragUpdateInfo info) {
+  bool onDragUpdate(DragUpdateInfo info) {
     // print("onDragUpdate: ${info.raw}, overlayDrop: ${_overlayDrop?.position}");
-    if (_dragId != pointerId) {
-      return false;
-    }
 
     final overlayDrop = _overlayDrop;
     if (overlayDrop is SpriteComponent) {
@@ -118,28 +112,22 @@ class DropField extends PositionComponent with Draggable {
       swapDrop(isHitDrop(localPosition), _draggedDrop);
     }
 
-    return super.onDragUpdate(pointerId, info);
+    return super.onDragUpdate(info);
   }
 
   @override
-  bool onDragEnd(int pointerId, DragEndInfo info) {
+  bool onDragEnd(DragEndInfo info) {
     print("onDragEnd: ${info.raw}");
-    if (_dragId != pointerId) {
-      return false;
-    }
 
     endDrag();
-    return super.onDragEnd(pointerId, info);
+    return super.onDragEnd(info);
   }
 
   @override
-  bool onDragCancel(int pointerId) {
-    print("onDragCancel: ${pointerId}");
-    if (_dragId != pointerId) {
-      return false;
-    }
+  bool onDragCancel() {
+    print("onDragCancel");
     endDrag();
-    return super.onDragCancel(pointerId);
+    return super.onDragCancel();
   }
 
   void endDrag() {
@@ -149,7 +137,6 @@ class DropField extends PositionComponent with Draggable {
       remove(_overlayDrop!);
     }
     _draggedDrop = null;
-    _dragId = null;
     _dragTimer.stop();
   }
 

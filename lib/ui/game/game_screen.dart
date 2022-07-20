@@ -25,7 +25,7 @@ class GameScreen extends PositionComponent with HasGameRef<PuzzleGame> {
   Future<void>? onLoad() async {
     await super.onLoad();
     titleTextComponent = TextComponent(
-      "ゲーム画面",
+      text: "ゲーム画面",
       textRenderer: Paints.large,
     )
       ..anchor = Anchor.center
@@ -34,7 +34,7 @@ class GameScreen extends PositionComponent with HasGameRef<PuzzleGame> {
     // button
     button = HudButtonComponent(
       margin: const EdgeInsets.all(8),
-      button: TextComponent("←",
+      button: TextComponent(text: "←",
           textRenderer: Paints.normal,
           position: Vector2(10, 20),
           size: Vector2(80, 80),
@@ -53,8 +53,8 @@ class GameScreen extends PositionComponent with HasGameRef<PuzzleGame> {
   }
 
   @override
-  void onGameResize(Vector2 gameSize) {
-    super.onGameResize(gameSize);
-    dropSize = gameSize.x / col;
+  void onGameResize(Vector2 size) {
+    super.onGameResize(size);
+    dropSize = size.x / col;
   }
 }

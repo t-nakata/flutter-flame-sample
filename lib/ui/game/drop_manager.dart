@@ -22,7 +22,7 @@ class DropManager {
   int dropDownEffectCount = 0;
   GameData data = GameData();
 
-  DropManager(this.dropSize, this.game,this.col, this.row,
+  DropManager(this.dropSize, this.game, this.col, this.row,
       {required this.addCallBack, required this.removeCallBack});
 
   init() {
@@ -68,8 +68,7 @@ class DropManager {
     return drop;
   }
 
-  onDragStart() {
-  }
+  onDragStart() {}
 
   swap(Vector2 v1, Vector2 v2) {
     if (v1.distanceTo(v2) == 0) {
@@ -206,10 +205,12 @@ class DropManager {
         hideList.remove(target);
         data.remove(target.first.dropType, target.length);
         for (var drop in target) {
-          var fadeOut = OpacityEffect(
-            opacity: 0,
-            duration: 0.2,
-            initialDelay: 0.3 * count,
+          var fadeOut = OpacityEffect.to(
+            0,
+            EffectController(
+              duration: 0.2,
+              startDelay: 0.3 * count,
+            ),
           );
           drop.component.add(fadeOut);
           drop.setVisible(false);
@@ -246,12 +247,9 @@ class DropManager {
           var oldY = drop.y;
           dropDownEffectCount++;
           drop.component.add(
-            MoveEffect(
-              path: [
-                Vector2(dropSize * i, dropSize * oldY),
-                Vector2(dropSize * i, dropSize * newY),
-              ],
-              speed: 1000,
+            MoveToEffect(
+              Vector2(0, dropSize * (oldY - newY)),
+              EffectController(duration: 1.0),
               onComplete: () {
                 drop.y = newY;
                 drop.move(Vector2(dropSize * i, dropSize * newY));
@@ -269,12 +267,9 @@ class DropManager {
             addCallBack.call(drop.component);
             dropDownEffectCount++;
             drop.component.add(
-              MoveEffect(
-                path: [
-                  Vector2(dropSize * i, dropSize * oldY),
-                  Vector2(dropSize * i, dropSize * newY),
-                ],
-                speed: 1000,
+              MoveToEffect(
+                Vector2(0, dropSize * (oldY - newY)),
+                EffectController(duration: 1.0),
                 onComplete: () {
                   dropMap.remove("${i}_$oldY");
                   drop.y = newY;
@@ -288,7 +283,6 @@ class DropManager {
         }
       }
     }
-
   }
 
   printDropMap() {

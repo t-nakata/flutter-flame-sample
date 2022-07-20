@@ -1,6 +1,7 @@
-import 'package:flame/components.dart';
+import 'package:flame/experimental.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame/game.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_flame/ui/game/game_screen.dart';
 import 'package:flutter_flame/ui/title/title_screen.dart';
 
@@ -14,8 +15,10 @@ class PuzzleGame extends FlameGame
   late GameScreen _gameScreen;
 
   static final fpsTextPaint = TextPaint(
-    config: const TextPaintConfig(
+    style: const TextStyle(
       color: Color(0xFFFFFFFF),
+      fontFamily: 'Arial',
+      fontSize: 24,
     ),
   );
 
@@ -30,12 +33,20 @@ class PuzzleGame extends FlameGame
         if (screen == Screen.game) {
           if (value == "normal") {
             _gameScreen = GameScreen(
-                (screen, value) => onGameScreenCallback(screen, value));
+              (screen, value) => onGameScreenCallback(
+                screen,
+                value,
+              ),
+            );
             _gameScreen.col = 6;
             _gameScreen.row = 5;
           } else if (value == "8x7") {
             _gameScreen = GameScreen(
-                    (screen, value) => onGameScreenCallback(screen, value));
+              (screen, value) => onGameScreenCallback(
+                screen,
+                value,
+              ),
+            );
             _gameScreen.col = 8;
             _gameScreen.row = 7;
           }
@@ -43,10 +54,14 @@ class PuzzleGame extends FlameGame
         }
       },
     );
-    _gameScreen =
-        GameScreen((screen, value) => onGameScreenCallback(screen, value));
-    add(_titleScreen);
-    // add(_gameScreen);
+    _gameScreen = GameScreen(
+      (screen, value) => onGameScreenCallback(
+        screen,
+        value,
+      ),
+    );
+    // add(_titleScreen);
+    add(_gameScreen);
   }
 
   @override
