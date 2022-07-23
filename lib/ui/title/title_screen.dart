@@ -1,5 +1,4 @@
 import 'package:flame/components.dart';
-import 'package:flame/game.dart';
 import 'package:flame/input.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -21,7 +20,7 @@ class TitleScreen extends PositionComponent with HasGameRef<PuzzleGame>  {
     await super.onLoad();
 
     titleTextComponent = TextComponent(
-      "パズルゲーム",
+      text: "パズルゲーム",
       textRenderer: Paints.large,
     )
       ..anchor = Anchor.center
@@ -51,7 +50,7 @@ class StartButton extends PositionComponent with Tappable {
 
   StartButton(this.screenCallback, this.value, {Vector2? position})
       : super(position: position ?? Vector2(0, 0), size: Vector2(280, 68)) {
-    textComponent = TextComponent("Start $value", textRenderer: Paints.large)
+    textComponent = TextComponent(text: "Start $value", textRenderer: Paints.large)
       ..anchor = Anchor.center
       ..x = (size.x - 10) / 2
       ..y = size.y / 2;

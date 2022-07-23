@@ -6,6 +6,7 @@ import 'package:flame/effects.dart';
 import 'package:flutter_flame/constants.dart';
 import 'package:flutter_flame/puzzle_game.dart';
 import 'package:flutter_flame/ui/game/drop_data.dart';
+import 'package:flutter_flame/ui/game/game_data.dart';
 
 typedef SpriteComponentCallBack = void Function(SpriteComponent);
 
@@ -18,11 +19,10 @@ class DropManager {
   SpriteComponentCallBack addCallBack;
   final int col;
   final int row;
-
-
   int dropDownEffectCount = 0;
+  GameData data = GameData();
 
-  DropManager(this.dropSize, this.game,this.col, this.row,
+  DropManager(this.dropSize, this.game, this.col, this.row,
       {required this.addCallBack, required this.removeCallBack});
 
   init() {
@@ -91,6 +91,7 @@ class DropManager {
     List<List<DropData>> removeList = checkChain();
     print("removeList: $removeList");
     fadeOutEffect(removeList.toList());
+    data.addCombo(removeList.length);
   }
 
   void onCompleteFadeOut() {
@@ -101,7 +102,7 @@ class DropManager {
   void onCompleteDropDown() {
     dropDownEffectCount--;
     if (dropDownEffectCount == 0) {
-      print("onCompleteDropDown");
+      print("onCompleteDropDown, $data");
       printDropMap();
       onDragEnd();
     }
@@ -202,11 +203,14 @@ class DropManager {
         count++;
         var target = hideList.first;
         hideList.remove(target);
+        data.remove(target.first.dropType, target.length);
         for (var drop in target) {
-          var fadeOut = OpacityEffect(
-            opacity: 0,
-            duration: 0.2,
-            initialDelay: 0.3 * count,
+          var fadeOut = OpacityEffect.to(
+            0,
+            EffectController(
+              duration: 0.2,
+              startDelay: 0.3 * count,
+            ),
           );
           drop.component.add(fadeOut);
           drop.setVisible(false);
@@ -218,6 +222,7 @@ class DropManager {
       }
     } else {
       availableUserAction = true;
+      data.resetCombo();
     }
   }
 
@@ -237,17 +242,15 @@ class DropManager {
       drops.sort((a, b) => a.y.compareTo(b.y) * -1);
       for (int j = 0; j < row; j++) {
         var newY = row - 1 - j;
+        final toPosition = Vector2(dropSize * i, dropSize * newY);
         if (drops.length > j) {
           var drop = drops[j];
-          var oldY = drop.y;
           dropDownEffectCount++;
+          print("x: ${toPosition.x}, y: ${toPosition.y}");
           drop.component.add(
-            MoveEffect(
-              path: [
-                Vector2(dropSize * i, dropSize * oldY),
-                Vector2(dropSize * i, dropSize * newY),
-              ],
-              speed: 1000,
+            MoveToEffect(
+              toPosition,
+              EffectController(duration: 0.2),
               onComplete: () {
                 drop.y = newY;
                 drop.move(Vector2(dropSize * i, dropSize * newY));
@@ -265,12 +268,9 @@ class DropManager {
             addCallBack.call(drop.component);
             dropDownEffectCount++;
             drop.component.add(
-              MoveEffect(
-                path: [
-                  Vector2(dropSize * i, dropSize * oldY),
-                  Vector2(dropSize * i, dropSize * newY),
-                ],
-                speed: 1000,
+              MoveToEffect(
+                toPosition,
+                EffectController(duration: 0.2),
                 onComplete: () {
                   dropMap.remove("${i}_$oldY");
                   drop.y = newY;
@@ -284,7 +284,6 @@ class DropManager {
         }
       }
     }
-
   }
 
   printDropMap() {

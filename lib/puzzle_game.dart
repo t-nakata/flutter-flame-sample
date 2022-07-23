@@ -1,26 +1,20 @@
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame/game.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_flame/ui/game/game_screen.dart';
 import 'package:flutter_flame/ui/title/title_screen.dart';
 
 typedef ScreenCallback = void Function(Screen, String);
 
-class PuzzleGame extends FlameGame
-    with FPSCounter, HasTappableComponents, HasDraggableComponents {
+class PuzzleGame extends FlameGame with HasTappables, HasDraggables {
   Screen _currentScreen = Screen.title;
 
   late TitleScreen _titleScreen;
   late GameScreen _gameScreen;
 
-  static final fpsTextPaint = TextPaint(
-    config: const TextPaintConfig(
-      color: Color(0xFFFFFFFF),
-    ),
-  );
-
   @override
-  Future<void>? onLoad() async {
+  Future<void> onLoad() async {
     await super.onLoad();
 
     _titleScreen = TitleScreen(
@@ -30,12 +24,20 @@ class PuzzleGame extends FlameGame
         if (screen == Screen.game) {
           if (value == "normal") {
             _gameScreen = GameScreen(
-                (screen, value) => onGameScreenCallback(screen, value));
+              (screen, value) => onGameScreenCallback(
+                screen,
+                value,
+              ),
+            );
             _gameScreen.col = 6;
             _gameScreen.row = 5;
           } else if (value == "8x7") {
             _gameScreen = GameScreen(
-                    (screen, value) => onGameScreenCallback(screen, value));
+              (screen, value) => onGameScreenCallback(
+                screen,
+                value,
+              ),
+            );
             _gameScreen.col = 8;
             _gameScreen.row = 7;
           }
@@ -43,27 +45,18 @@ class PuzzleGame extends FlameGame
         }
       },
     );
-    _gameScreen =
-        GameScreen((screen, value) => onGameScreenCallback(screen, value));
+    _gameScreen = GameScreen(
+      (screen, value) => onGameScreenCallback(
+        screen,
+        value,
+      ),
+    );
     add(_titleScreen);
     // add(_gameScreen);
+
+    add(FpsTextComponent(position: Vector2(0, 0)));
   }
 
-  @override
-  void render(Canvas canvas) {
-    super.render(canvas);
-
-    switch (_currentScreen) {
-      case Screen.title:
-        _titleScreen.render(canvas);
-        break;
-      case Screen.game:
-        _gameScreen.render(canvas);
-        break;
-    }
-
-    fpsTextPaint.render(canvas, fps(120).toString(), Vector2(0, 0));
-  }
 
   @override
   Color backgroundColor() => const Color(0xFFe3e3e3);

@@ -33,14 +33,16 @@ class ImagePath {
 class Paints {
 
   static TextPaint large = TextPaint(
-    config: const TextPaintConfig(
+    style: const TextStyle(
+      color: Colors.black,
       fontSize: 36.0,
       fontFamily: 'Awesome Font',
     ),
   );
 
   static TextPaint normal = TextPaint(
-    config: const TextPaintConfig(
+    style: const TextStyle(
+      color: Colors.black,
       fontSize: 24.0,
       fontFamily: 'Awesome Font',
     ),
