@@ -32,6 +32,7 @@ class GameScreen extends PositionComponent with HasGameRef<PuzzleGame> {
       ..position = Vector2(gameRef.size.x / 2, gameRef.size.y / 10);
 
     // button
+    // Fixme: 座標がおかしいので修正する必要がある
     button = HudButtonComponent(
       margin: const EdgeInsets.all(8),
       button: TextComponent(text: "←",
